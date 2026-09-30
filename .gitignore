@@ -1,0 +1,9 @@
+# Herramientas de agentes (no forman parte del sitio)
+.claude/
+.agents/
+skills-lock.json
+
+# Sistema
+Thumbs.db
+Desktop.ini
+.DS_Store
