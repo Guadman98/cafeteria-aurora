@@ -611,7 +611,8 @@ function showConfirmation(r) {
       <dt>Hora</dt><dd>${r.time} h</dd>
       <dt>Personas</dt><dd>${r.guests}</dd>
       <dt>Mesa</dt><dd>${t.id}, ${t.zone.toLowerCase()}</dd>
-    </dl>`;
+    </dl>
+    ${DEMO ? "" : `<p class="modal__note">Te enviamos la confirmación a <strong>${escapeHTML(r.email)}</strong>, con un enlace por si necesitas cancelar.</p>`}`;
   modal.hidden = false;
   modalClose.focus();
 }

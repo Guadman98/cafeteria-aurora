@@ -339,6 +339,18 @@ a { color: var(--chocolate); text-underline-offset: 4px; }
 .modal__box dd { margin: 0; font-weight: 500; }
 .code { font: 600 var(--fs-ml) var(--serif); color: var(--chocolate); letter-spacing: .08em; margin: 0; }
 
+/* ---------- Página de cancelación ---------- */
+.page-cancel .nav__inner { justify-content: center; }
+.cancel { min-height: calc(100vh - 88px); display: grid; place-items: center; padding: 3rem 16px; background: var(--arena); }
+.cancel__box { width: min(520px, 100%); background: var(--hueso); border-radius: var(--radio); border-top: 3px solid var(--chocolate); padding: clamp(1.75rem, 5vw, 2.5rem); }
+.cancel__box h1 { font-size: var(--fs-lg); margin-bottom: .75rem; }
+.cancel__box p { color: var(--texto-2); }
+.cancel__details { display: grid; grid-template-columns: auto 1fr; gap: .45rem 1.5rem; margin: 1.5rem 0; padding: 1rem 0; border-block: 1px solid var(--raya); }
+.cancel__details dt { color: var(--texto-2); }
+.cancel__details dd { margin: 0; font-weight: 500; }
+.cancel__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0 0; }
+.modal__note { margin: 0 0 1.25rem; font-size: var(--fs-sm); color: var(--texto-2); }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .fav-list { grid-template-columns: repeat(3, 1fr); }
