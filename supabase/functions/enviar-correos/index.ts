@@ -36,8 +36,8 @@ const SITIO = env("SITIO_URL").replace(/\/$/, "");
 const REMITENTE = `"Cafetería Aurora" <${GMAIL_USER}>`;
 
 // Datos de contacto que aparecen al pie de los correos (de ejemplo, igual que en la página)
-const DIRECCION = "Calle de los Almendros 24, Barrio del Parque";
-const TELEFONO = "(555) 010 1987";
+const DIRECCION = "Calle 12 # 4-56, Barrio del Parque";
+const TELEFONO = "+57 310 555 0198";
 
 // Gmail por SMTPS (465): Supabase bloquea los puertos 25 y 587 en las Edge Functions
 const transporter = nodemailer.createTransport({
@@ -73,7 +73,7 @@ const escape = (s: string) =>
 function cuando(inicio: string) {
   const [fecha, hora] = inicio.split("T");
   const [y, m, d] = fecha.split("-").map(Number);
-  const dia = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("es-MX", {
+  const dia = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("es-CO", {
     weekday: "long",
     day: "numeric",
     month: "long",

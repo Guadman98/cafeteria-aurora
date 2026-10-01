@@ -35,48 +35,53 @@ const fmtMin = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`
 
 /* ---------- Carta ---------- */
 // Capas del café de abajo hacia arriba: [ingrediente, fracción de la taza]
+// Precios de ejemplo en pesos colombianos (COP)
 const COFFEES = [
-  { name: "Espresso", price: 35, desc: "Un shot corto e intenso del tueste de la semana.", layers: [["espresso", 0.3]] },
-  { name: "Espresso doble", price: 45, desc: "Doble carga, para las mañanas largas.", layers: [["espresso", 0.5]] },
-  { name: "Americano", price: 40, desc: "Espresso alargado con agua caliente.", layers: [["espresso", 0.3], ["agua", 0.55]] },
-  { name: "Cortado", price: 42, desc: "Espresso “cortado” con un poco de leche.", layers: [["espresso", 0.35], ["leche", 0.3]] },
-  { name: "Capuccino", price: 55, desc: "Tercios iguales: espresso, leche y espuma. Con canela.", layers: [["espresso", 0.28], ["leche", 0.28], ["espuma", 0.3]] },
-  { name: "Latte", price: 55, desc: "Mucha leche, una capa delgada de espuma.", layers: [["espresso", 0.22], ["leche", 0.55], ["espuma", 0.1]] },
-  { name: "Mocha", price: 62, desc: "Chocolate de mesa en el fondo, espresso y leche.", layers: [["choco", 0.18], ["espresso", 0.22], ["leche", 0.36], ["espuma", 0.1]] },
-  { name: "Macchiato de caramelo", price: 65, desc: "Leche con vainilla, espresso encima y caramelo casero.", layers: [["leche", 0.5], ["espresso", 0.22], ["espuma", 0.08], ["caramelo", 0.06]] },
-  { name: "Café de olla", price: 45, desc: "La receta de doña Aurora: piloncillo y canela, en jarro de barro.", layers: [["olla", 0.78]] },
-  { name: "Cold brew", price: 58, desc: "Infusionado en frío 18 horas, servido con hielo.", layers: [["espresso", 0.35], ["hielo", 0.4]] },
+  { name: "Tinto", price: 3000, desc: "El de toda la vida: café filtrado, negro y recién colado.", layers: [["filtrado", 0.7]] },
+  { name: "Tinto campesino", price: 4000, desc: "La receta de doña Aurora: con panela y canela.", layers: [["panela", 0.18], ["filtrado", 0.6]] },
+  { name: "Perico", price: 4500, desc: "Café con un chorrito de leche, como se pide en la esquina.", layers: [["espresso", 0.35], ["leche", 0.3]] },
+  { name: "Espresso", price: 4500, desc: "Un shot corto e intenso del tueste de la semana.", layers: [["espresso", 0.3]] },
+  { name: "Americano", price: 5000, desc: "Espresso alargado con agua caliente.", layers: [["espresso", 0.3], ["agua", 0.55]] },
+  { name: "Capuccino", price: 7500, desc: "Tercios iguales: espresso, leche y espuma. Con canela.", layers: [["espresso", 0.28], ["leche", 0.28], ["espuma", 0.3]] },
+  { name: "Latte", price: 7500, desc: "Mucha leche, una capa delgada de espuma.", layers: [["espresso", 0.22], ["leche", 0.55], ["espuma", 0.1]] },
+  { name: "Mocca", price: 9000, desc: "Chocolate de mesa en el fondo, espresso y leche.", layers: [["choco", 0.18], ["espresso", 0.22], ["leche", 0.36], ["espuma", 0.1]] },
+  { name: "Macchiato de caramelo", price: 9500, desc: "Leche con vainilla, espresso encima y caramelo de la casa.", layers: [["leche", 0.5], ["espresso", 0.22], ["espuma", 0.08], ["caramelo", 0.06]] },
+  { name: "Cold brew", price: 8500, desc: "Infusionado en frío 18 horas, servido con hielo.", layers: [["espresso", 0.35], ["hielo", 0.4]] },
 ];
 
 const SALADOS = [
-  { name: "Molletes de la casa", price: 70, desc: "Bolillo, frijoles, queso gratinado y pico de gallo.", tags: ["veg"] },
-  { name: "Croissant de jamón y queso", price: 75, desc: "Hojaldre de mantequilla, recién horneado." },
-  { name: "Sándwich caprese", price: 85, desc: "Masa madre, jitomate, mozzarella y pesto.", tags: ["veg"] },
-  { name: "Tostada de aguacate", price: 90, desc: "Con huevo pochado y semillas tostadas." },
-  { name: "Quiche de espinacas", price: 80, desc: "Queso de cabra y ensalada verde.", tags: ["veg"] },
-  { name: "Wrap de pollo", price: 95, desc: "Pollo a la plancha y aderezo de yogur." },
-  { name: "Sincronizadas", price: 65, desc: "Tortilla de harina, jamón y queso.", tags: ["kids"] },
-  { name: "Pan de queso", price: 45, desc: "Seis bolitas crujientes por fuera.", tags: ["veg", "kids"] },
+  { name: "Pandebono", price: 3500, desc: "Recién salido del horno, con queso costeño.", tags: ["veg", "kids"] },
+  { name: "Almojábana", price: 3500, desc: "Suave y esponjosa, de queso y cuajada.", tags: ["veg"] },
+  { name: "Arepa de choclo", price: 9000, desc: "Dulce, a la plancha y con quesito fresco.", tags: ["veg", "kids"] },
+  { name: "Empanadas de carne", price: 7500, desc: "Tres empanadas crocantes con ají de la casa." },
+  { name: "Huevos pericos con arepa", price: 11000, desc: "Con tomate y cebolla larga, arepa y queso.", tags: ["veg"] },
+  { name: "Arepa rellena", price: 12000, desc: "Pollo desmechado, queso y hogao." },
+  { name: "Sándwich de la casa", price: 10500, desc: "Pan artesanal, jamón, queso y vegetales.", tags: ["kids"] },
+  { name: "Croissant de jamón y queso", price: 9500, desc: "Hojaldre de mantequilla, recién horneado." },
 ];
 
 const POSTRES = [
-  { name: "Pastel de zanahoria", price: 65, desc: "Con nuez, especias y betún de queso crema.", tags: ["veg"], signature: "La receta de doña Aurora, desde 1987" },
-  { name: "Concha rellena de nata", price: 40, desc: "Sale del horno a las seis de la mañana.", tags: ["veg"] },
-  { name: "Cheesecake de frutos rojos", price: 70, desc: "Base de galleta y compota casera.", tags: ["veg"] },
-  { name: "Brownie tibio", price: 55, desc: "Con nuez y helado de vainilla.", tags: ["veg", "kids"] },
-  { name: "Tarta de manzana", price: 60, desc: "Manzana con canela en masa quebrada.", tags: ["veg"] },
-  { name: "Hot cakes con miel", price: 70, desc: "Tres esponjosos, con mantequilla y fruta.", tags: ["veg", "kids"] },
-  { name: "Galleta de avena", price: 30, desc: "Con chispas de chocolate.", tags: ["veg", "kids"] },
+  { name: "Torta de zanahoria", price: 9500, desc: "Con nueces, especias y crema de queso.", tags: ["veg"], signature: "La receta de doña Aurora, desde 1987" },
+  { name: "Buñuelos", price: 4500, desc: "Tres buñuelos crocantes por fuera y suaves por dentro.", tags: ["veg", "kids"] },
+  { name: "Postre de natas", price: 8500, desc: "El clásico de la abuela, con un toque de canela.", tags: ["veg"] },
+  { name: "Tres leches", price: 9000, desc: "Bizcocho bañado en tres leches y merengue.", tags: ["veg"] },
+  { name: "Brevas con arequipe", price: 9500, desc: "Brevas caladas con arequipe y queso fresco.", tags: ["veg"] },
+  { name: "Torta de chocolate", price: 10000, desc: "Tibia, con helado de vainilla.", tags: ["veg", "kids"] },
+  { name: "Galleta de avena", price: 4000, desc: "Con chispas de chocolate.", tags: ["veg", "kids"] },
 ];
 
 const OTRAS = [
-  { name: "Chocolate caliente", price: 50, desc: "Chocolate de mesa batido, con malvaviscos.", tags: ["kids"] },
-  { name: "Chai latte", price: 55, desc: "Té negro especiado con leche." },
-  { name: "Tés e infusiones", price: 38, desc: "Manzanilla, menta, frutos rojos o verde." },
-  { name: "Jugo natural", price: 45, desc: "Naranja o verde, exprimido al momento.", tags: ["kids"] },
-  { name: "Smoothie de fresa", price: 60, desc: "Fresa, plátano y yogur natural.", tags: ["kids"] },
-  { name: "Leche con miel y canela", price: 35, desc: "Tibia, para los más pequeños.", tags: ["kids"] },
+  { name: "Chocolate con queso", price: 8500, desc: "Chocolate de mesa batido, con queso y almojábana.", tags: ["kids"] },
+  { name: "Aguapanela con limón", price: 4000, desc: "Caliente o fría, endulzada solo con panela.", tags: ["kids"] },
+  { name: "Aromática de frutas", price: 4500, desc: "Frutas frescas en infusión, sin azúcar añadida." },
+  { name: "Jugo natural", price: 7000, desc: "Lulo, mora o maracuyá, en agua o en leche.", tags: ["kids"] },
+  { name: "Limonada de coco", price: 9500, desc: "Cremosa y bien fría." },
+  { name: "Avena fría de la casa", price: 6000, desc: "Con canela, para los más pequeños.", tags: ["kids"] },
 ];
+
+// Formato colombiano: punto como separador de miles ($4.500). Se hace a mano porque
+// algunos navegadores no agrupan los números de 4 cifras en español.
+const money = (n) => "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
 const TAGS = {
   veg: `<span class="tag" title="Vegetariano">veg</span>`,
@@ -84,12 +89,13 @@ const TAGS = {
 };
 
 function itemHTML(d) {
-  const tags = (d.tags || []).map((t) => TAGS[t]).join("");
+  // Las etiquetas van juntas: si no caben, bajan en grupo y nunca queda una sola
+  const tags = d.tags ? `<span class="item__tags">${d.tags.map((t) => TAGS[t]).join("")}</span>` : "";
   return `
     <div class="item__line">
       <span class="item__name">${d.name}${tags}</span>
       <span class="item__dots" aria-hidden="true"></span>
-      <span class="item__price">$${d.price}</span>
+      <span class="item__price">${money(d.price)}</span>
     </div>
     <p class="item__desc">${d.desc}</p>`;
 }
@@ -624,7 +630,7 @@ form.addEventListener("submit", async (e) => {
     const key = Object.keys(SERVER_ERRORS).find((k) => err.message.includes(k));
     formError.textContent = key
       ? SERVER_ERRORS[key]
-      : "No pudimos guardar tu reserva. Revisa tu conexión e inténtalo de nuevo, o llámanos al (555) 010 1987.";
+      : "No pudimos guardar tu reserva. Revisa tu conexión e inténtalo de nuevo, o llámanos al +57 310 555 0198.";
     if (key === "MESA_OCUPADA") {
       selectedTable = null;
       refreshAvailability();

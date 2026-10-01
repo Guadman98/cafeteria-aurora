@@ -8,7 +8,7 @@ const box = document.getElementById("cancelBox");
 const params = new URLSearchParams(location.search);
 const codigo = (params.get("codigo") || "").trim().toUpperCase();
 const token = (params.get("token") || "").trim();
-const TELEFONO = "(555) 010 1987";
+const TELEFONO = "+57 310 555 0198";
 
 // Mismo acceso a la base de datos que en script.js
 async function rpc(fn, body) {

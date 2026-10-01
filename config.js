@@ -14,5 +14,5 @@
 window.AURORA_CONFIG = {
   supabaseUrl: "https://ihnbptnlcaqvustnzlop.supabase.co",
   supabaseKey: "sb_publishable_nWuDog0CHR4vWkFlV1v0vA_VjXfG4s_",
-  turnstileSiteKey: "",
+  turnstileSiteKey: "0x4AAAAAAFKvpGguHd68k16F",
 };
