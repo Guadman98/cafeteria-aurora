@@ -234,7 +234,9 @@ a { color: var(--chocolate); text-underline-offset: 4px; }
 .plan__bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .25rem 1rem; }
 .plan__bar strong { font: 500 var(--fs-ml) var(--serif); color: var(--chocolate); }
 .plan__bar span { color: var(--texto-2); font-size: var(--fs-sm); }
-.plan__map { display: block; width: 100%; height: auto; margin: .75rem 0 1rem; }
+.plan__map { display: block; width: 100%; height: auto; margin: .75rem 0 1rem; transition: opacity .2s; }
+/* Mientras se consulta la disponibilidad al servidor */
+.plan.is-loading .plan__map { opacity: .45; pointer-events: none; }
 
 .legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; font-size: var(--fs-sm); color: var(--texto-2); }
 .legend li { display: flex; align-items: center; gap: .5rem; }

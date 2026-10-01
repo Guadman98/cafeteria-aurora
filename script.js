@@ -243,6 +243,40 @@ drawRoom();
 TABLES.forEach(drawTable);
 
 /* ---------- Disponibilidad ---------- */
+const CONFIG = window.AURORA_CONFIG || {};
+// Sin datos de Supabase (config.js) la página funciona en modo demostración
+const DEMO = !CONFIG.supabaseUrl || !CONFIG.supabaseKey;
+
+// Llama a una función de la base de datos (supabase/schema.sql) a través de la API de Supabase
+async function rpc(fn, params) {
+  const headers = { "Content-Type": "application/json", apikey: CONFIG.supabaseKey };
+  // Las claves "anon" heredadas son JWT y también van en Authorization; las nuevas "publishable" no
+  if (CONFIG.supabaseKey.startsWith("eyJ")) headers.Authorization = `Bearer ${CONFIG.supabaseKey}`;
+  const res = await fetch(`${CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(params),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || `HTTP ${res.status}`);
+  return data;
+}
+
+// Mesas ocupadas para la fecha y hora elegidas (se recarga al cambiarlas)
+let busyTables = new Set();
+let availabilityFailed = false;
+let availabilityRequest = 0;
+
+async function fetchBusyTables(date, time) {
+  if (DEMO) {
+    return TABLES.filter((t) => isBusyDemo(t.id, date, time)).map((t) => t.id);
+  }
+  return rpc("mesas_ocupadas", { p_fecha: date, p_hora: time });
+}
+
+const isBusy = (tableId) => availabilityFailed || busyTables.has(tableId);
+
+/* --- Modo demostración: ocupación simulada y reservas en este navegador --- */
 const STORAGE_KEY = "aurora-reservas";
 
 function loadReservations() {
@@ -278,7 +312,7 @@ function hash(str) {
   return (h >>> 0) / 4294967295;
 }
 
-function isBusy(tableId, date, time) {
+function isBusyDemo(tableId, date, time) {
   if (!date || !time) return false;
   const hour = parseInt(time, 10);
   // Más ocupación a la hora del desayuno y de la merienda
@@ -340,7 +374,42 @@ function formatDate(iso) {
   return new Date(y, m - 1, d).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
 }
 
-function refreshFloor() {
+const plan = document.querySelector(".plan");
+const AVAILABILITY_ERROR = "No pudimos consultar las mesas libres. Revisa tu conexión e inténtalo de nuevo.";
+
+// Pide la ocupación al servidor y vuelve a pintar el plano
+async function refreshAvailability() {
+  const date = dateInput.value;
+  const time = timeSelect.value;
+  const request = ++availabilityRequest;
+
+  if (!date || !time) {
+    busyTables = new Set();
+    renderFloor();
+    return;
+  }
+
+  plan.classList.add("is-loading");
+  floorWhen.textContent = "Consultando mesas libres…";
+  try {
+    const busy = await fetchBusyTables(date, time);
+    if (request !== availabilityRequest) return; // llegó una respuesta vieja: la ignoramos
+    busyTables = new Set(busy.map(Number));
+    availabilityFailed = false;
+    if (formError.textContent === AVAILABILITY_ERROR) formError.textContent = "";
+  } catch (err) {
+    if (request !== availabilityRequest) return;
+    console.error("Disponibilidad:", err);
+    availabilityFailed = true;
+    formError.textContent = AVAILABILITY_ERROR;
+  } finally {
+    if (request === availabilityRequest) plan.classList.remove("is-loading");
+  }
+  renderFloor();
+}
+
+// Pinta el plano con la ocupación ya cargada (sin ir al servidor)
+function renderFloor() {
   const date = dateInput.value;
   const time = timeSelect.value;
   const guests = Number(guestsSelect.value);
@@ -349,7 +418,7 @@ function refreshFloor() {
 
   if (selectedTable) {
     const t = TABLES.find((x) => x.id === selectedTable);
-    if (isBusy(t.id, date, time) || t.cap < guests) selectedTable = null;
+    if (isBusy(t.id) || t.cap < guests) selectedTable = null;
   }
 
   const options = [`<option value="">Elige en el plano</option>`];
@@ -357,7 +426,7 @@ function refreshFloor() {
 
   TABLES.forEach((t) => {
     const g = svg.querySelector(`.table[data-id="${t.id}"]`);
-    const busy = !time || isBusy(t.id, date, time);
+    const busy = !time || isBusy(t.id);
     const small = t.cap < guests;
     g.classList.remove("is-free", "is-busy", "is-small", "is-selected");
 
@@ -382,7 +451,7 @@ function refreshFloor() {
   tableSelect.innerHTML = options.join("");
   tableSelect.value = selectedTable || "";
 
-  if (time && freeCount === 0) {
+  if (time && freeCount === 0 && !availabilityFailed) {
     formError.textContent = "No quedan mesas para ese horario y tamaño de grupo. Prueba otra hora.";
   } else if (formError.textContent.startsWith("No quedan")) {
     formError.textContent = "";
@@ -393,7 +462,7 @@ function selectTable(id) {
   const t = TABLES.find((x) => x.id === id);
   const guests = Number(guestsSelect.value);
   if (!timeSelect.value) return;
-  if (isBusy(id, dateInput.value, timeSelect.value)) {
+  if (isBusy(id)) {
     formError.textContent = `La mesa ${id} está ocupada a esa hora. Elige una de las libres.`;
     return;
   }
@@ -403,25 +472,40 @@ function selectTable(id) {
   }
   formError.textContent = "";
   selectedTable = selectedTable === id ? null : id;
-  refreshFloor();
+  renderFloor();
 }
 
+// Cambiar fecha u hora consulta al servidor; personas y mesa solo vuelven a pintar
 dateInput.addEventListener("change", () => {
   if (!dateInput.value || dateInput.value < dateInput.min) dateInput.value = dateInput.min;
   buildTimeSlots();
-  refreshFloor();
+  refreshAvailability();
 });
-timeSelect.addEventListener("change", refreshFloor);
-guestsSelect.addEventListener("change", refreshFloor);
+timeSelect.addEventListener("change", refreshAvailability);
+guestsSelect.addEventListener("change", renderFloor);
 tableSelect.addEventListener("change", () => {
   selectedTable = tableSelect.value ? Number(tableSelect.value) : null;
-  refreshFloor();
+  renderFloor();
 });
 
 form.addEventListener("input", (e) => e.target.classList.remove("is-invalid"));
 
-form.addEventListener("submit", (e) => {
+// Mensajes para los errores que devuelve crear_reserva() en supabase/schema.sql
+const SERVER_ERRORS = {
+  MESA_OCUPADA: "Alguien acaba de apartar esa mesa. Ya actualizamos el plano: elige otra.",
+  MESA_NO_DISPONIBLE: "Esa mesa no se puede reservar en línea. Elige otra.",
+  CAPACIDAD: "Esa mesa no alcanza para tu grupo. Elige una más grande.",
+  FECHA_FUERA_DE_RANGO: "Ese horario ya no está disponible para reservar. Elige otra hora.",
+  FUERA_DE_HORARIO: "Ese horario está fuera de nuestro horario de reservas.",
+  DATOS_INVALIDOS: "Revisa tu nombre, teléfono y correo.",
+  LIMITE_RESERVAS: "Ya tienes varias reservas activas con este teléfono. Si necesitas cambiar alguna, llámanos.",
+};
+
+const submitButton = form.querySelector('button[type="submit"]');
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (submitButton.disabled) return;
   const fields = {
     name: document.getElementById("name"),
     phone: document.getElementById("phone"),
@@ -451,7 +535,6 @@ form.addEventListener("submit", (e) => {
   }
 
   const reservation = {
-    code: "AUR-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
     date: dateInput.value,
     time: timeSelect.value,
     guests: Number(guestsSelect.value),
@@ -461,7 +544,44 @@ form.addEventListener("submit", (e) => {
     email: fields.email.value.trim(),
     notes: document.getElementById("notes").value.trim(),
   };
-  saveReservation(reservation);
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Reservando…";
+  formError.textContent = "";
+
+  try {
+    if (DEMO) {
+      reservation.code = "AUR-" + Math.random().toString(36).slice(2, 7).toUpperCase();
+      saveReservation(reservation);
+    } else {
+      const result = await rpc("crear_reserva", {
+        p_mesa: reservation.table,
+        p_fecha: reservation.date,
+        p_hora: reservation.time,
+        p_personas: reservation.guests,
+        p_nombre: reservation.name,
+        p_telefono: reservation.phone,
+        p_correo: reservation.email,
+        p_notas: reservation.notes || null,
+      });
+      reservation.code = result.codigo;
+    }
+  } catch (err) {
+    console.error("Reserva:", err);
+    const key = Object.keys(SERVER_ERRORS).find((k) => err.message.includes(k));
+    formError.textContent = key
+      ? SERVER_ERRORS[key]
+      : "No pudimos guardar tu reserva. Revisa tu conexión e inténtalo de nuevo, o llámanos al (555) 010 1987.";
+    if (key === "MESA_OCUPADA") {
+      selectedTable = null;
+      refreshAvailability();
+    }
+    return;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Confirmar reserva";
+  }
+
   showConfirmation(reservation);
 
   form.reset();
@@ -469,7 +589,7 @@ form.addEventListener("submit", (e) => {
   selectedTable = null;
   initDate();
   buildTimeSlots();
-  refreshFloor();
+  refreshAvailability();
 });
 
 /* ---------- Confirmación ---------- */
@@ -510,4 +630,4 @@ if (!timeSelect.value) {
   dateInput.value = toISO(tomorrow);
   buildTimeSlots();
 }
-refreshFloor();
+refreshAvailability();
