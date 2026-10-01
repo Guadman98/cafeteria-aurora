@@ -262,6 +262,50 @@ async function rpc(fn, params) {
   return data;
 }
 
+// Llama a una Edge Function (supabase/functions/…)
+async function callFunction(name, body) {
+  const headers = { "Content-Type": "application/json", apikey: CONFIG.supabaseKey };
+  if (CONFIG.supabaseKey.startsWith("eyJ")) headers.Authorization = `Bearer ${CONFIG.supabaseKey}`;
+  const res = await fetch(`${CONFIG.supabaseUrl.replace(/\/$/, "")}/functions/v1/${name}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.message) || `HTTP ${res.status}`);
+  return data;
+}
+
+// Versión de la política que acepta el cliente (debe coincidir con privacidad.html)
+const POLITICA_VERSION = "1.0 (2026-09-30)";
+
+/* --- Captcha (Cloudflare Turnstile): solo si hay Site Key en config.js --- */
+let captchaToken = null;
+let captchaWidget = null;
+
+function initCaptcha() {
+  if (DEMO || !CONFIG.turnstileSiteKey) return;
+  window.onTurnstileLoad = () => {
+    captchaWidget = window.turnstile.render("#captcha", {
+      sitekey: CONFIG.turnstileSiteKey,
+      language: "es",
+      appearance: "interaction-only", // solo se muestra si Cloudflare necesita que la persona confirme
+      callback: (token) => (captchaToken = token),
+      "expired-callback": () => (captchaToken = null),
+      "error-callback": () => (captchaToken = null),
+    });
+  };
+  const s = document.createElement("script");
+  s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad";
+  s.async = true;
+  document.head.appendChild(s);
+}
+
+function resetCaptcha() {
+  captchaToken = null;
+  if (captchaWidget !== null && window.turnstile) window.turnstile.reset(captchaWidget);
+}
+
 // Mesas ocupadas para la fecha y hora elegidas (se recarga al cambiarlas)
 let busyTables = new Set();
 let availabilityFailed = false;
@@ -371,7 +415,7 @@ function buildTimeSlots() {
 
 function formatDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
 }
 
 const plan = document.querySelector(".plan");
@@ -499,6 +543,8 @@ const SERVER_ERRORS = {
   FUERA_DE_HORARIO: "Ese horario está fuera de nuestro horario de reservas.",
   DATOS_INVALIDOS: "Revisa tu nombre, teléfono y correo.",
   LIMITE_RESERVAS: "Ya tienes varias reservas activas con este teléfono. Si necesitas cambiar alguna, llámanos.",
+  SIN_AUTORIZACION: "Para reservar necesitamos tu autorización para tratar tus datos.",
+  CAPTCHA: "No pudimos comprobar que no eres un robot. Espera unos segundos e inténtalo de nuevo.",
 };
 
 const submitButton = form.querySelector('button[type="submit"]');
@@ -528,6 +574,8 @@ form.addEventListener("submit", async (e) => {
     errors.push("revisa tu correo");
     fields.email.classList.add("is-invalid");
   }
+  const consent = document.getElementById("consent");
+  if (!consent.checked) errors.push("acepta la política de tratamiento de datos");
 
   if (errors.length) {
     formError.textContent = "Falta poco: " + errors.join(", ") + ".";
@@ -554,19 +602,24 @@ form.addEventListener("submit", async (e) => {
       reservation.code = "AUR-" + Math.random().toString(36).slice(2, 7).toUpperCase();
       saveReservation(reservation);
     } else {
-      const result = await rpc("crear_reserva", {
-        p_mesa: reservation.table,
-        p_fecha: reservation.date,
-        p_hora: reservation.time,
-        p_personas: reservation.guests,
-        p_nombre: reservation.name,
-        p_telefono: reservation.phone,
-        p_correo: reservation.email,
-        p_notas: reservation.notes || null,
+      if (CONFIG.turnstileSiteKey && !captchaToken) throw new Error("CAPTCHA");
+      const result = await callFunction("crear-reserva", {
+        mesa: reservation.table,
+        fecha: reservation.date,
+        hora: reservation.time,
+        personas: reservation.guests,
+        nombre: reservation.name,
+        telefono: reservation.phone,
+        correo: reservation.email,
+        notas: reservation.notes || null,
+        acepta_politica: consent.checked,
+        politica_version: POLITICA_VERSION,
+        captcha: captchaToken,
       });
       reservation.code = result.codigo;
     }
   } catch (err) {
+    resetCaptcha(); // cada token de Turnstile sirve una sola vez
     console.error("Reserva:", err);
     const key = Object.keys(SERVER_ERRORS).find((k) => err.message.includes(k));
     formError.textContent = key
@@ -583,6 +636,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   showConfirmation(reservation);
+  resetCaptcha();
 
   form.reset();
   formError.textContent = "";
@@ -632,3 +686,4 @@ if (!timeSelect.value) {
   buildTimeSlots();
 }
 refreshAvailability();
+initCaptcha();

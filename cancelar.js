@@ -31,7 +31,7 @@ const escapeHTML = (s) =>
 function cuando(inicio) {
   const [fecha, hora] = inicio.split("T");
   const [y, m, d] = fecha.split("-").map(Number);
-  const dia = new Date(y, m - 1, d).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+  const dia = new Date(y, m - 1, d).toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
   return { dia, hora: hora.slice(0, 5) };
 }
 

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel del personal · Cafetería Aurora</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#F5EFE8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="icon" type="image/png" href="assets/web/favicon.png" />
+</head>
+<body class="page-staff">
+
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a href="./" class="nav__logo"><img src="assets/web/logo.png" alt="Cafetería Aurora, ir al sitio" width="480" height="540" /></a>
+      <p class="staff__title">Panel del personal</p>
+      <div class="staff__session" id="session" hidden>
+        <span id="staffName"></span>
+        <button class="btn btn--line" id="logout" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Inicio de sesión -->
+    <section class="staff-login" id="loginView" hidden>
+      <form class="form staff-login__box" id="loginForm" novalidate>
+        <h1>Entrar al panel</h1>
+        <p>Usa la cuenta que te dio la administración de la cafetería.</p>
+        <label>Correo <input type="email" id="loginEmail" autocomplete="username" required /></label>
+        <label>Contraseña <input type="password" id="loginPassword" autocomplete="current-password" required /></label>
+        <p class="form__error" id="loginError" role="alert"></p>
+        <button class="btn btn--dark btn--block" type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <!-- Panel -->
+    <section class="staff" id="panelView" hidden>
+      <div class="wrap">
+        <div class="staff__bar">
+          <div class="staff__day">
+            <button class="btn btn--line staff__nav" id="prevDay" type="button" aria-label="Día anterior">‹</button>
+            <input type="date" id="day" aria-label="Día" />
+            <button class="btn btn--line staff__nav" id="nextDay" type="button" aria-label="Día siguiente">›</button>
+            <button class="btn btn--line" id="today" type="button">Hoy</button>
+          </div>
+          <p class="staff__updated" id="updated" aria-live="polite"></p>
+        </div>
+
+        <h1 class="staff__date" id="dayTitle"></h1>
+        <ul class="staff__stats" id="stats"></ul>
+        <p class="form__error" id="panelError" role="alert"></p>
+
+        <div class="staff__list" id="list"></div>
+
+        <section class="staff__tables" aria-labelledby="tablesTitle">
+          <h2 id="tablesTitle">Mesas en la reserva en línea</h2>
+          <p>Desactiva una mesa para guardarla a quienes llegan sin reserva. No afecta las reservas que ya tiene.</p>
+          <ul class="staff__table-list" id="tables"></ul>
+        </section>
+      </div>
+    </section>
+
+    <!-- Sin permiso -->
+    <section class="staff-login" id="deniedView" hidden>
+      <div class="staff-login__box">
+        <h1>Sin acceso al panel</h1>
+        <p>Tu cuenta inició sesión, pero no está registrada como personal de la cafetería. Pide a la administración que te dé acceso.</p>
+        <button class="btn btn--dark" id="deniedLogout" type="button">Cerrar sesión</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=3"></script>
+  <script src="personal.js?v=1"></script>
+</body>
+</html>

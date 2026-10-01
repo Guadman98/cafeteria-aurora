@@ -53,6 +53,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+/* "hidden" siempre oculta, aunque una regla le dé display: flex/grid */
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; scroll-padding-top: 96px; }
 body {
   margin: 0;
@@ -298,6 +300,11 @@ a { color: var(--chocolate); text-underline-offset: 4px; }
 .form .is-invalid { border-color: #b3261e; }
 .form textarea { resize: vertical; }
 .form ::placeholder { color: #8f7c6d; }
+.form__consent { display: flex !important; align-items: flex-start; gap: .7rem; margin: 0 0 1rem; font-weight: 400 !important; line-height: 1.5; }
+.form__consent input { flex: none; width: 20px !important; height: 20px; margin: .15rem 0 0 !important; padding: 0; accent-color: var(--chocolate); cursor: pointer; }
+.form__consent a { color: var(--chocolate); font-weight: 500; }
+.form__captcha:empty { display: none; }
+.form__captcha { margin: 0 0 1rem; }
 .form__error { color: #b3261e; font-weight: 500; min-height: 1.4em; margin: 0 0 .75rem; font-size: var(--fs-sm); }
 .form__hint { margin: .8rem 0 0; font-size: var(--fs-sm); color: var(--texto-2); }
 
@@ -326,6 +333,7 @@ a { color: var(--chocolate); text-underline-offset: 4px; }
 .footer__links a { color: var(--hueso); text-decoration: none; font-size: var(--fs-xs); letter-spacing: .12em; text-transform: uppercase; }
 .footer__links a:hover { text-decoration: underline; }
 .footer p { margin: 0; font-size: var(--fs-sm); }
+.footer p a { color: var(--hueso); }
 .footer :focus-visible { outline-color: var(--miel); }
 
 /* ---------- Confirmación ---------- */
@@ -338,6 +346,81 @@ a { color: var(--chocolate); text-underline-offset: 4px; }
 .modal__box dt { color: var(--texto-2); }
 .modal__box dd { margin: 0; font-weight: 500; }
 .code { font: 600 var(--fs-ml) var(--serif); color: var(--chocolate); letter-spacing: .08em; margin: 0; }
+
+/* ---------- Política de datos ---------- */
+.page-legal .nav__cta { margin-left: auto; }
+.legal { padding: clamp(3rem, 7vw, 5rem) 0; }
+.legal__inner { max-width: 760px; }
+.legal h1 { font-size: var(--fs-xl); margin-bottom: .5rem; }
+.legal h1 em { font-style: italic; color: var(--caramelo); }
+.legal h2 { font: 600 var(--fs-md)/1.3 var(--sans); color: var(--chocolate); margin: 2.5rem 0 .75rem; }
+.legal p, .legal li { color: var(--texto-2); }
+.legal ul { padding-left: 1.25rem; margin: 0 0 1em; }
+.legal li { margin-bottom: .45rem; }
+.legal strong { color: var(--tinta); font-weight: 600; }
+.legal__meta { font-size: var(--fs-sm); margin-bottom: 2rem; }
+.legal__card { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1.5rem; margin: 0; padding: 1.25rem; background: var(--arena); border-radius: var(--radio); }
+.legal__card dt { color: var(--texto-2); font-size: var(--fs-sm); }
+.legal__card dd { margin: 0; }
+.legal__draft { margin: 0 0 2rem; padding: 1rem 1.1rem; border-left: 3px solid var(--caramelo); background: #f3e6d4; font-size: var(--fs-sm); }
+.legal mark { background: #f3dcb8; color: var(--tinta); padding: 0 .25em; border-radius: 2px; }
+.legal__back { margin-top: 2.5rem; }
+
+/* ---------- Panel del personal ---------- */
+.staff__title { margin: 0; font: 600 var(--fs-xs) var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--texto-2); }
+.staff__session { margin-left: auto; display: flex; align-items: center; gap: 1rem; font-size: var(--fs-sm); }
+.staff__session .btn { padding: .55em 1em; font-size: var(--fs-xs); }
+.staff-login { min-height: calc(100vh - 88px); display: grid; place-items: center; padding: 3rem 16px; background: var(--arena); }
+.staff-login__box { width: min(420px, 100%); background: var(--hueso); border-radius: var(--radio); border-top: 3px solid var(--chocolate); padding: 2rem; }
+.staff-login__box h1 { font-size: var(--fs-lg); margin-bottom: .5rem; }
+.staff-login__box p { color: var(--texto-2); }
+.staff { padding: 2rem 0 4rem; }
+.staff__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.staff__day { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.staff__day input { padding: .6em .8em; border: 1px solid var(--borde); border-radius: 3px; background: var(--hueso-claro); font: var(--fs-base) var(--sans); color: var(--tinta); }
+.staff__day .btn { padding: .65em 1em; }
+.staff__nav { font-size: var(--fs-md) !important; line-height: 1 !important; padding: .45em .8em !important; }
+.staff__updated { margin: 0; font-size: var(--fs-sm); color: var(--texto-2); }
+.staff__date { font-size: var(--fs-xl); margin: 1.75rem 0 1rem; }
+.staff__stats { list-style: none; padding: 0; margin: 0 0 1.5rem; display: flex; flex-wrap: wrap; gap: .5rem 2rem; color: var(--texto-2); }
+.staff__stats strong { font: 600 var(--fs-ml) var(--serif); color: var(--chocolate); margin-right: .2rem; }
+.staff__list { display: grid; gap: .75rem; }
+.staff__empty { padding: 2rem; text-align: center; background: var(--arena); border-radius: var(--radio); color: var(--texto-2); }
+.booking { display: grid; grid-template-columns: 90px 1fr auto; gap: 1.25rem; align-items: center; padding: 1rem 1.25rem; background: var(--hueso-claro); border: 1px solid var(--raya); border-left: 3px solid var(--chocolate); border-radius: var(--radio); }
+.booking__time strong { display: block; font: 600 var(--fs-ml) var(--serif); color: var(--chocolate); }
+.booking__time span { font-size: var(--fs-xs); color: var(--texto-2); }
+.booking p { margin: 0; }
+.booking__name { font-weight: 600; }
+.booking__badge { margin-left: .5rem; padding: .1em .55em; border-radius: 2px; background: var(--arena); font: 500 var(--fs-xs)/1.5 var(--sans); color: var(--chocolate); vertical-align: .1em; }
+.booking__meta, .booking__contact { font-size: var(--fs-sm); color: var(--texto-2); }
+.booking__contact { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin-top: .2rem !important; }
+.booking__notes { margin-top: .35rem !important; font: italic 500 var(--fs-base) var(--serif); color: var(--caramelo); }
+.booking__actions { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; }
+.booking__actions .btn { padding: .6em 1em; font-size: var(--fs-xs); }
+.staff__danger { border-color: #b3261e !important; color: #b3261e !important; }
+.staff__danger:hover { background: #b3261e !important; color: #fff !important; }
+.staff__note { font-size: var(--fs-sm); color: var(--texto-2); }
+.booking.is-llego { border-left-color: #5d8a4e; }
+.booking.is-llego .booking__badge { background: #e2ecd9; color: #3c5f31; }
+.booking.is-no_llego, .booking.is-cancelada { border-left-color: #b9a796; opacity: .7; }
+.booking.is-cancelada .booking__name { text-decoration: line-through; }
+.staff__tables { margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--raya); }
+.staff__tables h2 { font: 600 var(--fs-md) var(--sans); margin-bottom: .35rem; }
+.staff__tables > p { color: var(--texto-2); font-size: var(--fs-sm); }
+.staff__table-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .6rem 1.5rem; }
+.switch { display: flex; align-items: center; gap: .75rem; cursor: pointer; font-size: var(--fs-sm); }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch__track { flex: none; position: relative; width: 40px; height: 22px; border-radius: 999px; background: #cbbba9; transition: background .15s; }
+.switch__track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch input:checked + .switch__track { background: var(--chocolate); }
+.switch input:checked + .switch__track::after { transform: translateX(18px); }
+.switch input:focus-visible + .switch__track { outline: 2px solid var(--caramelo); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .page-staff .nav__toggle { display: none; }
+  .staff__title { display: none; }
+  .booking { grid-template-columns: 70px 1fr; }
+  .booking__actions { grid-column: 1 / -1; justify-content: flex-start; }
+}
 
 /* ---------- Página de cancelación ---------- */
 .page-cancel .nav__inner { justify-content: center; }

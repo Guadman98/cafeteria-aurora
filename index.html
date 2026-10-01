@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <link rel="icon" type="image/png" href="assets/web/favicon.png" />
 </head>
 <body>
@@ -242,9 +242,14 @@
                 <label>Correo <input type="email" id="email" name="email" autocomplete="email" required /></label>
               </div>
               <label>Algo que debamos saber <span class="opt">(opcional)</span>
-                <textarea id="notes" name="notes" rows="2" placeholder="Cumpleaños, silla para bebé, alergias…"></textarea>
+                <textarea id="notes" name="notes" rows="2" placeholder="Cumpleaños, silla para bebé, mesa cerca de la ventana…"></textarea>
               </label>
             </fieldset>
+            <label class="form__consent">
+              <input type="checkbox" id="consent" name="consent" required />
+              <span>Autorizo a Cafetería Aurora a tratar mis datos personales para gestionar esta reserva, según su <a href="privacidad.html" target="_blank" rel="noopener">Política de Tratamiento de Datos Personales</a>.</span>
+            </label>
+            <div class="form__captcha" id="captcha"></div>
             <p class="form__error" id="formError" role="alert"></p>
             <button type="submit" class="btn btn--dark btn--block">Confirmar reserva</button>
             <p class="form__hint">Guardamos la mesa 15 minutos después de la hora.</p>
@@ -291,7 +296,7 @@
         <a href="#reservas">Reservas</a>
         <a href="#visita">Horario</a>
       </nav>
-      <p>Cafetería Aurora · Desde 1987 en el Barrio del Parque.</p>
+      <p>Cafetería Aurora · Desde 1987 en el Barrio del Parque. · <a href="privacidad.html">Política de datos personales</a></p>
     </div>
   </footer>
 
@@ -304,7 +309,7 @@
     </div>
   </div>
 
-  <script src="config.js?v=2"></script>
-  <script src="script.js?v=4"></script>
+  <script src="config.js?v=3"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>
