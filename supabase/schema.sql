@@ -21,7 +21,7 @@ create extension if not exists btree_gist;
 -- ---------- Ajustes generales (una sola fila) ----------
 create table public.ajustes (
   id boolean primary key default true check (id),
-  zona_horaria text not null default 'America/Mexico_City',
+  zona_horaria text not null default 'America/Bogota',
   duracion interval not null default interval '90 minutes',   -- cuánto ocupa la mesa cada reserva
   anticipacion interval not null default interval '30 minutes', -- mínimo antes de la hora reservada
   dias_maximos int not null default 60,                        -- hasta cuántos días adelante se reserva
